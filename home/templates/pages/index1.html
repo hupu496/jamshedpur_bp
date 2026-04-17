@@ -1,0 +1,667 @@
+{% extends 'layouts/base_background.html' %}
+{% load static %}
+{% block css %}
+.mt-n6 {
+margin-top: 0rem !important;
+}
+.text-gradient.text-primary {
+background-image: linear-gradient(195deg, #021750, #021750);
+}
+.btn-primary {
+--bs-btn-color: #000;
+--bs-btn-bg: #f37022;
+--bs-btn-border-color: #f37022;
+}
+.Cd{
+border-style: solid;
+border-color: #3e4f7a;
+border-radius: 9px;
+}
+marquee {
+width: 100%;
+height: 100%;
+display: block;
+}
+/* Add this for watermark background */
+.watermark-background {
+    background-image: url("{% static 'img/IndianOil_background.jpg' %}");
+    background-size: cover; /* Ensures the image covers the entire container */
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.2; /* Controls the opacity of the watermark */
+    position: fixed; /* Keeps the background fixed during scrolling */
+    top: 0;
+    left: 0;
+    width: 100vw; /* Full viewport width */
+    height: 100vh; /* Full viewport height */
+    z-index: -1; /* Sends the image behind other content */
+}
+.linear-text-gradient {
+                background: linear-gradient(to top, #eb6c21, #02154d);
+                -webkit-background-clip: text;
+                background-clip: text;
+                color: transparent;
+            }
+
+ .text-success {
+    color: #2d332d !important;
+}
+ .carousel-item {
+            background-color: #43A047;
+            color: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+        .item2 {
+            background-color: #F44335;
+            color: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+.visitor-input::placeholder {
+  color: black;
+  font-weight: bold;
+}
+{% endblock css %}
+{% block title %} IOCL | Head Count System {% endblock title %}
+{% block body %} class="index-page bg-gray-200" {% endblock body %}
+{% block content %}
+{% if messages %}
+  {% for message in messages %}
+  {% if message.tags == 'success' %}
+    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert" style="margin-bottom: 35px;">
+         <span class="alert-icon text-white"><i class="ni ni-like-2"></i></span>
+        <span class="alert-text text-white"><strong>Success!</strong>{{ message }}</span>
+     
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    {% else %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-bottom: 35px;">
+    <span class="alert-icon text-white"><i class="ni ni-like-2"></i></span>
+    <span class="alert-text text-white"><strong>Error!</strong> {{ message }}</span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+{% endif %}
+  {% endfor %}
+{% endif %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type="text/javascript">
+   $(document).ready(function () {
+    var ajaxInterval;
+
+    {% if not form_valid or is_today %}
+    ajaxInterval = setInterval(function () {
+        $.ajax({
+            url: "{% url 'live_data' %}",
+            type: 'GET',
+            success: function (data) {
+               console.log(data);
+                if (!data || data.error) {
+                    console.log(data.error || 'No data received');
+                    return;
+                }
+                
+                // Update counts
+                $('#hazard-in').text(data.hazard_in_count);
+                $('#hazard-out').text(data.hazard_out_count);
+                $('#hazard-total').text(data.hazard_total);
+                $('#non-hazard-in').text(data.non_hazard_in);
+                $('#non-hazard-out').text(data.non_hazard_out);
+                $('#non-hazard-total').text(data.non_hazard_total);
+              
+                
+               // Update department-wise counts for non-hazardous
+                     var nonHazardousHtml = `<tr  style="font-size: 13px;">`;
+                    data.non_hazardous.forEach(function (item) {
+                    nonHazardousHtml += `<td style="color: white;">${item.HeadCount}</td>`;
+                    });
+                    nonHazardousHtml += `</tr>`;
+                    $("#non-hazardous-table tbody").html(nonHazardousHtml);
+
+                    // Update hazardous table
+                    var hazardousHtml = `<tr  style="font-size: 13px;">`;
+                    data.hazardous.forEach(function (item) {
+                        hazardousHtml += `<td style="color: white;">${item.HeadCount}</td>`;
+                    });
+                    hazardousHtml += `</tr>`;
+                    $("#hazardous-table tbody").html(hazardousHtml);
+                // Update live data
+                var liveDataHtml = '';
+                data.live_data.forEach(function (item) {
+                    var machine = item.machine || {};
+                    var employee = item.employee || {};
+                    var colorStyle = '';
+
+                    if (machine.machineno === '7' || machine.machineno === '8') {
+                        colorStyle = 'background-color:#4CAF50; color: white;';
+                    } else if (machine.machineno === '1' || machine.machineno === '2' || machine.machineno === '4' || machine.machineno === '3' || machine.machineno === '5' || machine.machineno === '6') {
+                        colorStyle = 'background-color:#F44335; color: white;';
+                    }
+
+                    liveDataHtml += `
+                        <h6 style="${colorStyle} padding: 5px; border-radius: 5px;">
+                            ${employee.empcode || 'N/A'} &nbsp; ${employee.Name || 'N/A'} 
+                            &nbsp;&nbsp;&nbsp;&nbsp; ${machine.Name || 'N/A'} ${machine.Response || ''}
+                        </h6>`;
+                });
+
+                $('#live-data-container').html(liveDataHtml);
+                
+            },
+            error: function (xhr, status, error) {
+                console.error('Error occurred:', error);
+            },
+        });
+    }, 5000);
+    {% endif %}
+});
+
+</script>
+</div></div></div>
+{% load static %}
+<div class="watermark-background"></div>
+<div class=" mx-3 mx-md-4 mt-n6" style="padding: 0px;border-radius: 10px;font-size: 24px;box-shadow: 2px 4px 29px 2px #e6d2ad;">
+   <b class="text-center text-success" style="font-size: 42px">
+      <img src="{% static 'img/indianOil.png' %}" width="20%">GATE WISE HEAD COUNT DISPLAY JAMSHEDPUR BP AS ON&nbsp; &nbsp; 
+      <form method="post" style="display:inline;">
+         {% csrf_token %}
+         {{ form.selected_date }}
+         <button type="submit" class="btn btn-sm bg-gradient-success" style="margin-top: 25px;height: 100%;width: 5%;height: 45px;">Refresh</button>
+      </form>
+   </b>
+   <div class="container-fluid">
+      <div class="row">
+         <div class="col-md-9 col-12">
+             <section class="Cd pt-3 pb-4" id="count-stats">
+      <div class="container-fluid">
+         <div class="row">
+            <div class="col-lg-12 mx-auto py-4">
+               <!-- <div  style="border: 5px solid transparent;border-image: linear-gradient(#01154d, #eb6c21) 1; border-radius: 21px; padding: 10px; position: relative;">
+                  <h2 style=" font-size:48px;position: absolute; top: -35px; left: 50%; transform: translateX(-50%); background-color: white; padding: 0 10px; color: #4caf50;">HAZARDOUS AREA</h2>
+                  <div class="row">
+                     <div class="col-md-3 position-relative">
+                        <div class="p-2 text-center">
+                           <h1 class="text-gradient text-primary"><img src="{% static 'img/head.png' %}"style="width: 38%;"></h1>
+                           <div >
+                              
+                              <h4 class="text-gradient text-primary" style="
+                                    font-size: 40px;
+                                "></i>MAIN GATE</h4>
+                              
+                                                          </div>
+                                                        </div>
+                                                        <hr class="vertical dark">
+                                                    </div>
+                                                    <div class="col-md-3 position-relative">
+                                    <div class="p-3 text-center">
+                                        <h1 class="text-gradient text-primary" style="font-size: 69px;"><i class="fas fa-users"></i></h1>
+                                        <h5 class="mt-3" style="font-size: 30px;">TOTAL HEAD COUNT</h5>
+                                        <a href="list/MAIN GATE TOTAL HEAD COUNT" target="_blank" class="btn btn-icon btn-2 bg-gradient-success" style="width: 145px;margin-top:13px;height: 60px;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+                                            <b style="font-size: 30px;" id="non-hazard-total">{{ non_hazard_total }}</b>
+                                        </a>
+                                    </div>
+                                    <hr class="vertical dark">
+                                    <div style="background-color: #43A047; border-radius: 10px;">
+                                        
+                                        <table id="non-hazardous-table" style="background-color: #43A047; border-radius: 10px; width: 100%; text-align: center;">
+                                            <thead>
+                                                <tr style="font-size: 13px;">
+                                                    {% for data in non_hazardous %}
+                                                        <th style="color: white; padding: 5px 7px;">{{ data.Department }}</th>
+                                                    {% endfor %}
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr style="font-size: 13px;">
+                                                    {% for data in non_hazardous %}
+                                                        <td style="color: white;">{{ data.HeadCount }}</td>
+                                                    {% endfor %}
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                      
+                                        
+                                    </div>
+                                </div>
+                     <div class="col-md-3 position-relative">
+                        <div class="p-3 text-center">
+                           <h1 class="text-gradient text-primary"style="
+                              font-size: 69px;" ><i class="far fa-arrow-alt-circle-right"></i></h1>
+                                                    <h5 class="mt-3" style="
+                              font-size: 40px;
+                          ">IN</h5>
+                           <a href="list/MAIN GATE IN" target="_blank" class="btn btn-icon btn-2 bg-gradient-success"style="width: 145px;height: 60px;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); margin-top: 3px;">
+                           <b style="font-size: 30px;" id="non-hazard-in">{{ non_hazard_in }}</b>
+                           </a>
+                        </div>
+                        <hr class="vertical dark">
+                     </div>
+                     <div class="col-md-3">
+                        <div class="p-3 text-center">
+                           <h1 class="text-gradient text-primary"style="
+                            font-size: 69px;" ><i class="far fa-arrow-alt-circle-left"></i></h1>
+                                                  <h5 class="mt-3" style="
+                            font-size: 40px;
+                        ">OUT</h5>
+                           <a href="list/MAIN GATE OUT" target="_blank" class="btn btn-icon btn-2 bg-gradient-success"style="width: 145px;height: 60px;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); margin-top: 3px;">
+                           <b style="font-size: 30px;" id="non-hazard-out">{{ non_hazard_out }}</b>
+                           </a>
+                        </div>
+                     </div>
+                  </div>
+               </div> -->
+               <!--  -->
+               <br>
+               <div style="margin-top: 12px;border: 5px solid transparent;border-image: linear-gradient(#01154d, #eb6c21) 1; border-radius: 21px; padding: 16px; position: relative;">
+                  <h2 style="font-size:48px;position: absolute; top: -35px; left: 50%; transform: translateX(-50%); background-color: white; padding: 0 10px; color: #f44335;">HAZARDOUS AREA</h2>
+                  <div class="row">
+                     <div class="col-md-3 position-relative">
+                        <div class="p-3 text-center">
+                           <div >
+                              <h4 class="text-gradient text-primary" style="
+    font-size: 40px;"></i>LICENCE GATE</h4>
+   <!-- <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#gate3Modal">Gate 3 Visitor</button> -->
+                           </div>
+                        </div>
+                        <hr class="vertical dark">
+                     </div>
+                     <div class="col-md-3 position-relative">
+                        <div class="p-3 text-center">
+                           <h1 class="text-gradient text-primary"></h1>
+                          <h5 class="mt-3" style="font-size: 30px;">TOTAL HEAD COUNT</h5>
+                           <a href="list/LICENCE TOTAL HEAD COUNT"  class="btn btn-icon btn-2 btn btn-danger" style="width: 145px;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);height: 60px;">
+                           <b style="font-size: 30px;" id="hazard-total">{{ hazard_total }}</b>
+                           </a>
+                        </div>
+                        <hr class="vertical dark">
+                      <div style="background-color: #F44335; border-radius: 10px;">
+        
+                        <table id="hazardous-table" style="background-color: #F44335; border-radius: 10px; width: 100%; text-align: center;">
+                            <thead>
+                                <tr  style="font-size: 13px;" >
+                                    {% for data in hazardous %}
+                                        <th style="color: white; padding: 5px 7px;">{{ data.Department }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr  style="font-size: 13px;">
+                                    {% for data in hazardous %}
+                                        <td style="color: white;">{{ data.HeadCount }}</td>
+                                    {% endfor %}
+                                </tr>
+                            </tbody>
+                        </table>
+    </div>
+                     </div>
+                     <div class="col-md-3 position-relative">
+                        <div class="p-3 text-center">
+                           <h1 class="text-gradient text-primary" ></h1>
+                         <h5 class="mt-3" style="font-size: 30px;">IN</h5>
+                           <a href="list/LICENCE IN"  class="btn btn-icon btn-2 btn btn-danger"style="width: 145px;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);height: 60px;" >
+                           <b style="font-size: 30px;" id="hazard-in">{{ hazard_in_count }}</b>
+                           </a>
+                        </div>
+                        <hr class="vertical dark">
+                     </div>
+                     <div class="col-md-3">
+                        <div class="p-3 text-center">
+                           <h1 class="text-gradient text-primary" ></h1>
+                        <h5 class="mt-3" style="font-size: 30px;">OUT</h5>
+                           <a href="list/LICENCE OUT"  class="btn btn-icon btn-2 btn btn-danger"style="width: 145px;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);height: 60px;" >
+                           <b style="font-size: 30px;" id="hazard-out">{{ hazard_out_count }}</b>
+                           </a>
+                        </div>
+                     </div>
+                   
+                  </div>
+               </div> 
+               <!--  -->
+            </div>
+         </div>
+      </div>
+</section>
+         </div>
+         <div class="col-md-3 col-12">
+             <img src="{% static 'img/notification.png' %}" width="30%" style="margin-top:-148px; margin-left: 100px; text-align: center;">
+                <div id="live-data-container" style="height: 700px;">
+            {% for item in data %}
+            {% if item.machine.machineno == '1' or item.machine.machineno == '5' or item.machine.machineno == '9' %}
+            <h6 style="background-color:#4CAF50; color: white; padding: 5px; border-radius: 5px;">{{ item.employee.empcode }}&nbsp;{{ item.employee.Name }}&nbsp;&nbsp;&nbsp;&nbsp;{{ item.machine.Name }} {{ item.machine.Response }}</h6>
+            {% elif item.machine.machineno == '2' or item.machine.machineno == '6' or item.machine.machineno == '10' %}
+            <h6 style="background-color:#4CAF50; color: white; padding: 5px; border-radius: 5px;">{{ item.employee.empcode }}&nbsp;{{ item.employee.Name }}&nbsp;&nbsp;&nbsp;&nbsp;{{ item.machine.Name }} {{ item.machine.Response }}</h6>
+            {% elif item.machine.machineno == '3' or item.machine.machineno == '7' %}
+            <h6 style="background-color:#F44335; color: white; padding: 5px; border-radius: 5px;">{{ item.employee.empcode }}&nbsp;{{ item.employee.Name }}&nbsp;&nbsp;&nbsp;&nbsp;{{ item.machine.Name }}{{ item.machine.Response }}</h6>
+            {% elif item.machine.machineno == '4' or item.machine.machineno == '8' %}
+            <h6 style="background-color:#F44335; color: white; padding: 5px; border-radius: 5px;">{{ item.employee.empcode }}&nbsp;{{ item.employee.Name }}&nbsp;&nbsp;&nbsp;&nbsp;{{ item.machine.Name }}{{ item.machine.Response }}</h6>
+            {% endif %}
+        {% endfor %}
+    </div>
+            
+      </div>
+   </div>
+</div>
+<!-- modal -->
+<div class="modal fade" id="mainModal" tabindex="-1" aria-labelledby="mainModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <form method="POST" action="{% url 'gatepass_view' %}">
+         {% csrf_token %}
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="mainModalLabel">Main Gate Visitor</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+       
+     <div class="form-group">
+    <label style="font-weight: 500; color:black;">Entry Type:</label><br>
+    <input type="radio" name="entry_type" value="in" id="inRadio" checked> IN
+    <input type="radio" name="entry_type" value="out" id="outRadio"> OUT
+  </div>
+
+  
+  <div id="inSection">
+  <div class="row">
+      <div class="col-md-6">
+      <div class="form-group">
+      <div class="input-group input-group-outline is-valid my-3">
+        <label class="form-label" style="color:black;">No Of Vistors <span style="color:red;">*</span></label>
+      <input type="number" id="noOfVisitors" name="noOfPerson" class="form-control" value="1" min="1">
+      </div>
+    </div>
+    <div id="visitorNames" class="input-group-outline "></div>
+    </div>
+  
+    <div class="col-md-6">
+      <div class="form-group">
+      <div class="input-group input-group-outline is-valid my-3">
+      <label class="form-label" style="color:black;">Pass No(optional)</label>
+      <input type="text" name="passNo" class="form-control" >
+    </div>
+    </div>
+    </div>
+    <div class="col-md-6">
+      <div class="form-group">
+         <div class="input-group input-group-outline is-valid my-3">
+      <!-- <label  class="form-label">Date</label> -->
+      <input type="date" name="date" id="dateField" class="form-control" readonly>
+      </div>
+    </div>
+    </div>
+
+    </div>  
+  </div>
+  <div id="outSection" style="display:none;">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="form-group">
+          <label style="color:black; font-weight: 500;">Select Card (IN visitors not yet OUT)</label>
+         <select id="outCardSelect" name="cardNo" class="form-control">
+          {% for entry in open_cards_trid1 %}
+          <option value="{{ entry.cardNo }}" style="color:black;">{{ entry.cardNo }} - {{ entry.name }}</option>
+          {% endfor %}
+        </select>
+
+        </div>
+      </div>
+      <div class="col-md-6">
+         <div class="form-group">
+          <label style="color:black;">Visitor Name</label>
+          <input type="text" style="color:black;" id="outName" class="form-control" readonly>
+      </div>
+    </div>
+    </div>
+   </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+         <button type="submit" class="btn btn-warning">Submit</button>
+      </div>
+    </div>
+    </form>
+  </div>
+</div>
+
+<!-- Button trigger modal -->
+<div class="modal fade" id="gate3Modal" tabindex="-1" aria-labelledby="gate3ModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+   <form method="POST" action="{% url 'gatepass_viewout' %}">
+         {% csrf_token %}
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="mainModalLabel">Gate3 Visitor</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+       
+     <div class="form-group">
+    <label style="color:black; font-weight: 500;">Entry Type:</label><br>
+    <input type="radio" name="entry_type" value="in" id="inRadiog" checked> IN
+    <input type="radio" name="entry_type" value="out" id="outRadiog"> OUT
+  </div>
+
+  
+  <div id="inSectiong">
+  <div class="row">
+      <div class="col-md-6">
+      <div class="form-group">
+      <div class="input-group input-group-outline is-valid my-3">
+        <label class="form-label" style="color:black;">No Of Vistors <span style="color:red;">*</span></label>
+      <input type="number" id="noOfVisitorsg" name="noOfPerson" class="form-control" value="1" min="1">
+      </div>
+    </div>
+    <div id="visitorNamesg" class="input-group-outline "></div>
+    </div>
+  
+    <div class="col-md-6">
+      <div class="form-group">
+      <div class="input-group input-group-outline is-valid my-3">
+      <label class="form-label"style="color:black;">Pass No(optional)</label>
+      <input type="text" name="passNo" style="color:black;" class="form-control" >
+    </div>
+    </div>
+    </div>
+    <div class="col-md-6">
+      <div class="form-group">
+         <div class="input-group input-group-outline is-valid my-3">
+      <label  class="form-label" style="color:black;">Date</label>
+      <input type="date" name="date" style="color:black;" id="dateFieldg" class="form-control" readonly>
+      </div>
+    </div>
+    </div>
+
+    </div>  
+  </div>
+  <div id="outSectiong" style="display:none;">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="form-group">
+          <label style="color:black; font-weight: 500;">Select Card (IN visitors not yet OUT)</label>
+         <select id="outCardSelectg" name="cardNo" class="form-control">
+          {% for entry in open_cards_trid3 %}
+          <option value="{{ entry.cardNo }}" style="color:black;">{{ entry.cardNo }} - {{ entry.name }}</option>
+          {% endfor %}
+        </select>
+
+        </div>
+      </div>
+      <div class="col-md-6">
+         <div class="form-group">
+          <label>Visitor Name</label>
+          <input type="text" id="outNameg" class="form-control" style="color:black;" readonly>
+      </div>
+    </div>
+    </div>
+   </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
+         <button type="submit" class="btn btn-warning">Submit</button>
+      </div>
+    </div>
+    </form>
+  </div>
+</div>
+<!-- <p>{{ context }}</p> -->
+{% endblock content %}
+{% block javascripts %}
+<script src="{% static 'js/plugins/countup.min.js' %}"></script>
+<script src="{% static 'js/plugins/choices.min.js' %}"></script>
+<script src="{% static 'js/plugins/prism.min.js' %}"></script>
+<script src="{% static 'js/plugins/highlight.min.js' %}"></script>
+<!--  Plugin for Parallax, full documentation here: https://github.com/dixonandmoe/rellax -->
+<script src="{% static 'js/plugins/rellax.min.js' %}"></script>
+<!--  Plugin for TiltJS, full documentation here: https://gijsroge.github.io/tilt.js/ -->
+<script src="{% static 'js/plugins/tilt.min.js' %}"></script>
+<!--  Plugin for Selectpicker - ChoicesJS, full documentation here: https://github.com/jshjohnson/Choices -->
+<script src="{% static 'js/plugins/choices.min.js' %}"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    const formattedDate = `${yyyy}-${mm}-${dd}`;
+
+    document.getElementById("dateField").value = formattedDate;
+    document.getElementById("dateFieldg").value = formattedDate;
+  });
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const inRadio = document.getElementById('inRadio');
+  const outRadio = document.getElementById('outRadio');
+  const inSection = document.getElementById('inSection');
+  const outSection = document.getElementById('outSection');
+  const noOfVisitors = document.getElementById('noOfVisitors');
+  const visitorNames = document.getElementById('visitorNames');
+  const outCardSelect = document.getElementById('outCardSelect');
+  const outName = document.getElementById('outName');
+
+  function generateVisitorFields(count) {
+  visitorNames.innerHTML = '';
+  for (let i = 0; i < count; i++) {
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.name = `name_${i + 1}`;
+    input.className = 'form-control mb-2 visitor-input'; // Added a class
+    input.placeholder = `Visitor ${i + 1} Name`;
+    visitorNames.appendChild(input);
+  }
+}
+
+  noOfVisitors.addEventListener('input', () => {
+    generateVisitorFields(parseInt(noOfVisitors.value));
+  });
+
+  inRadio.addEventListener('change', () => {
+    if (inRadio.checked) {
+      inSection.style.display = 'block';
+      outSection.style.display = 'none';
+    }
+  });
+
+  outRadio.addEventListener('change', () => {
+    if (outRadio.checked) {
+      inSection.style.display = 'none';
+      outSection.style.display = 'block';
+    }
+  });
+
+  outCardSelect.addEventListener('change', function() {
+    const selected = this.options[this.selectedIndex].text;
+    const name = selected.split(' - ')[1];
+    outName.value = name;
+  });
+
+  generateVisitorFields(1); // default on load
+});
+</script>
+<!-- gate 3 -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const inRadio = document.getElementById('inRadiog');
+  const outRadio = document.getElementById('outRadiog');
+  const inSection = document.getElementById('inSectiong');
+  const outSection = document.getElementById('outSectiong');
+  const noOfVisitors = document.getElementById('noOfVisitorsg');
+  const visitorNames = document.getElementById('visitorNamesg');
+  const outCardSelect = document.getElementById('outCardSelectg');
+  const outName = document.getElementById('outNameg');
+
+  function generateVisitorFieldsg(count) {
+    visitorNames.innerHTML = '';
+    for (let i = 0; i < count; i++) {
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.name = `name_${i + 1}`;
+      input.className = 'form-control mb-2 visitor-input';
+      input.placeholder = `Visitor ${i + 1} Name`;
+      visitorNames.appendChild(input);
+    }
+  }
+
+  noOfVisitors.addEventListener('input', () => {
+    generateVisitorFieldsg(parseInt(noOfVisitors.value));
+  });
+
+  inRadio.addEventListener('change', () => {
+    if (inRadio.checked) {
+      inSection.style.display = 'block';
+      outSection.style.display = 'none';
+    }
+  });
+
+  outRadio.addEventListener('change', () => {
+    if (outRadio.checked) {
+      inSection.style.display = 'none';
+      outSection.style.display = 'block';
+    }
+  });
+
+  outCardSelect.addEventListener('change', function() {
+    const selected = this.options[this.selectedIndex].text;
+    const name = selected.split(' - ')[1];
+    outName.value = name;
+  });
+
+  generateVisitorFieldsg(1); // default on load
+});
+</script>
+
+<script type="text/javascript">
+   if (document.getElementById('state1')) {
+     const countUp = new CountUp('state1', document.getElementById("state1").getAttribute("countTo"));
+     if (!countUp.error) {
+       countUp.start();
+     } else {
+       console.error(countUp.error);
+     }
+   }
+   if (document.getElementById('state2')) {
+     const countUp1 = new CountUp('state2', document.getElementById("state2").getAttribute("countTo"));
+     if (!countUp1.error) {
+       countUp1.start();
+     } else {
+       console.error(countUp1.error);
+     }
+   }
+   if (document.getElementById('state3')) {
+     const countUp2 = new CountUp('state3', document.getElementById("state3").getAttribute("countTo"));
+     if (!countUp2.error) {
+       countUp2.start();
+     } else {
+       console.error(countUp2.error);
+     };
+   }
+</script>
+{% endblock javascripts %}

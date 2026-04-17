@@ -1,0 +1,79 @@
+{% extends 'layouts/visitor_base.html' %}
+{% load static %}
+{% block css %}
+
+.bg-gradient-dark {
+    --bs-btn-color: #000;
+    --bs-btn-bg: #f37022;
+    --bs-btn-border-color: #f37022;
+  }
+  
+ {% endblock css %}
+
+{% block title %} IOCL | Head Count System {% endblock title %}
+
+{% block body %} class="index-page bg-gray-200" {% endblock body %}
+
+{% block content %}
+
+</div></div></div>
+
+<div class="card card-body blur shadow-blur mx-3 mx-md-4 mt-n4">
+  <section class="pt-3 pb-4 justify-content-center" id="count-stats">
+  <div class="container">
+    <div class="row">
+        <div class="col-md-8 my-2">
+          <form method="POST">
+            {% csrf_token %}
+                <h3 class="text-center">Edit Employee</h3>
+           
+                             <b>Edit Empcode</b>
+                           <div class="input-group input-group-outline is-valid my-3">
+                              <input type="text" name="empcode"  class="form-control" value="{{ form.instance.empcode }}">
+                           </div>
+                      <b>Edit Name</b>
+                           <div class="input-group input-group-outline is-valid my-3">
+                             <input type="text" name="Name" id="id_Name" class="form-control" value="{{ form.instance.Name }}">
+
+                           </div>
+              
+       
+           
+    <button href="{% url 'emp_master' %}" class="btn btn-warning w-100">Submit</button>
+    </form>
+        </div> 
+    </div>
+  </div>
+</section>
+</div>
+{% endblock content %}
+{% block javascripts %}
+<!--  Plugin for TypedJS, full documentation here: https://github.com/inorganik/CountUp.js -->
+<script src="{% static 'js/plugins/countup.min.js' %}"></script>
+<script src="{% static 'js/plugins/choices.min.js' %}"></script>
+<script src="{% static 'js/plugins/prism.min.js' %}"></script>
+<script src="{% static 'js/plugins/highlight.min.js' %}"></script>
+<!--  Plugin for Parallax, full documentation here: https://github.com/dixonandmoe/rellax -->
+<script src="{% static 'js/plugins/rellax.min.js' %}"></script>
+<!--  Plugin for TiltJS, full documentation here: https://gijsroge.github.io/tilt.js/ -->
+<script src="{% static 'js/plugins/tilt.min.js' %}"></script>
+<!--  Plugin for Selectpicker - ChoicesJS, full documentation here: https://github.com/jshjohnson/Choices -->
+<script src="{% static 'js/plugins/choices.min.js' %}"></script>
+<script type="text/javascript">
+        $(document).ready(function() {
+            var designationDict = {{ designation_dict|safe }};
+            $('#department-select').change(function() {
+                var selectedDept = $(this).val();
+                var designations = designationDict[selectedDept] || [];
+                
+                var designationSelect = $('#designation-select');
+                designationSelect.empty();
+                designationSelect.append('<option>Select Designation</option>');
+                
+                designations.forEach(function(designation) {
+                    designationSelect.append('<option value="' + designation.Desgid + '">' + designation.Designation + '</option>');
+                });
+            });
+        });
+    </script>
+{% endblock javascripts %}
