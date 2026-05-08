@@ -43,7 +43,7 @@ urlpatterns = [
     path('delete_employee/<int:pk>/', views.delete_employee, name='delete_employee'),
     path('edit_designation/<int:pk>/', views.edit_designation, name='edit_designation'),
     path('delete_designation/<int:pk>/', views.delete_designation, name='delete_designation'),
-    path('category/',views.category, name='category'),
+  
     path('con_mismatch/',views.con_mismatch,name='con_mismatch'),
     path('in_console/',views.in_console,name='in_console'),
     path('upload/', views.upload_employee_data, name='upload_employee_data'),

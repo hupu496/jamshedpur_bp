@@ -5,11 +5,43 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
-  <!-- <button onclick="downloadPDF()">Download PDF</button> -->
-
-  <div >
+ 
+<h4>TOTAL HAZARDOUS: {{ hazard_total }}</h4>
+   <table id="hazardous-table" style="background-color: #F44335; border-radius: 10px; width: 100%; text-align: center;">
+                            <thead>
+                                <tr  style="font-size: 13px;" >
+                                    {% for data in hazardous %}
+                                        <th style="color: white; padding: 5px 7px;">{{ data.Department }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr  style="font-size: 13px;">
+                                    {% for data in hazardous %}
+                                        <td style="color: white;">{{ data.HeadCount }}</td>
+                                    {% endfor %}
+                                </tr>
+                            </tbody>
+                        </table>
+       <h4>TOTAL NON-HAZARDOUS: {{ non_hazard_total }}</h4>
+      <table id="non-hazardous-table" style="background-color: #43A047; border-radius: 10px; width: 100%; text-align: center;">
+                                            <thead>
+                                                <tr style="font-size: 13px;">
+                                                    {% for data in non_hazardous %}
+                                                        <th style="color: white; padding: 5px 7px;">{{ data.Department }}</th>
+                                                    {% endfor %}
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr style="font-size: 13px;">
+                                                    {% for data in non_hazardous %}
+                                                        <td style="color: white;">{{ data.HeadCount }}</td>
+                                                    {% endfor %}
+                                                </tr>
+                                            </tbody>
+                                        </table>
+<div>
    <h3>Headcount Report - {{ selected_date }}Total Records: {{ total }}</h3>
-
 {% if data %}
  <table border="1" cellpadding="5" id="pdf-content">
   <thead>
@@ -29,11 +61,11 @@
     {% for item in data %}
       <tr>
         <td>{{ item.srno }}</td>
-        <td>{{ item.machine.Name }} ({{ item.machine.Response }})</td>
+        <td>{{ item.machine.RDRNAME }} ({{ item.machine.Response }})</td>
         <td>{{ item.monitor.EnrollID }}</td>
         <td>{{ item.employee.Name }}</td>
         <td>{{ item.monitor.PunchDate|date:"Y-m-d" }}</td>
-        <td>{{ item.machine.machineno }}</td>
+        <td>{{ item.machine.MachineNo }}</td>
         <td>{{ item.monitor.PunchDate|date:"h:i:s a" }}</td>
         <td>{{ item.employee.department.DepartName }}</td>
         <td>{{ item.employee.designation.Designation }}</td>

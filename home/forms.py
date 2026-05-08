@@ -12,7 +12,7 @@ class CompanyForm(forms.ModelForm):
 class MachineForm(forms.ModelForm):
     class Meta:
         model = MachineMast
-        fields = ['SRNO','devicemodel','machineno','Name','Response']
+        fields = ['SRNO','MachineType','MachineNo','RDRNAME','Response']
 
 class DepartForm(forms.ModelForm):
     class Meta:

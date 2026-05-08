@@ -73,7 +73,7 @@
           <div class="input-group input-group-outline my-2">
             <select type="text" class="form-control" name="location" id="exampleFormControlSelect1" disabled>
               {% for item in machine %}
-                <option value="{{ item.SRNO }}">{{ item.Name }}-{{ item.Response }}</option>
+                <option value="{{ item.SRNO }}">{{ item.RDRNAME }}-{{ item.Response }}</option>
               {% endfor %}
             </select>
           </div>
@@ -131,7 +131,7 @@
               <td>
                 <div class="d-flex px-2 py-1">
                   <div class="d-flex flex-column justify-content-center">
-                    <p class="text-xs text-secondary mb-0">{{ item.machine.Name }}({{ item.machine.Response }})</p>
+                    <p class="text-xs text-secondary mb-0">{{ item.machine.RDRNAME }}({{ item.machine.Response }})</p>
                   </div>
                 </div>
               </td>
@@ -145,7 +145,7 @@
                 <span class="text-secondary text-xs font-weight-normal">{{ item.monitor.PunchDate }}</span>
               </td>
               <td class="align-middle text-center">
-                <span class="text-secondary text-xs font-weight-normal">{{ item.machine.machineno }}</span>
+                <span class="text-secondary text-xs font-weight-normal">{{ item.machine.MachineNo }}</span>
               </td>
               <td class="align-middle text-center">
                 <span class="text-secondary text-xs font-weight-normal">{{ item.monitor.PunchDate|date:"h:i:s a" }}</span>

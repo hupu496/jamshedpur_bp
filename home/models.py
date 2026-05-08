@@ -37,15 +37,27 @@ class GatePass(models.Model):
     status                       = models.CharField(max_length=250, default='true')
     def __str__(self):
             return f"GatePass {self.id}"
+    class Meta:
+        db_table = 'GatePass'
 class MachineMast(models.Model):
     id = models.IntegerField(primary_key=True)
-    machineno = models.CharField(max_length=50)
-    devicemodel = models.TextField()
+    MachineNo = models.CharField(max_length=50)
+    RDRNO = models.CharField(max_length=50)
+    PortNo = models.CharField(max_length=50)
+    Password = models.CharField(max_length=100)
+    con_status = models.CharField(max_length=50)
+    Site = models.CharField(max_length=50)
+    MachineType = models.TextField()
     SRNO = models.CharField(max_length=100, unique=True)
-    Name = models.TextField()
+    RDRNAME = models.TextField()
+    IPAddress = models.TextField()
+    IO=models.CharField(max_length=50)
+    LastConnected = models.DateTimeField(null=True, blank=True)
     Response = models.TextField(null=True, blank=True)
     def __str__(self):
         return self.SRNO
+    class Meta:
+        db_table = 'Machines'
 
 class EnrollMast(models.Model):
     id = models.IntegerField(primary_key=True)
@@ -53,6 +65,8 @@ class EnrollMast(models.Model):
     department = models.ForeignKey('DepartMast', on_delete=models.CASCADE, null=True)
     def __str__(self):
         return str(self.id)
+    class Meta:
+        db_table = 'EnrollMast'
 
 class EmpMast(models.Model): 
     ids = models.BigAutoField(primary_key=True)
@@ -60,25 +74,35 @@ class EmpMast(models.Model):
     enrollid = models.ForeignKey(EnrollMast, on_delete=models.CASCADE, null=True)
     Cardno = models.CharField(max_length=50)
     Name = models.TextField(blank=True, null=True)
-    department = models.ForeignKey('DepartMast', on_delete=models.CASCADE, null=True)
-    company = models.ForeignKey('CompanyMast', on_delete=models.CASCADE, null=True)
-    designation = models.ForeignKey('DesMast', on_delete=models.CASCADE, null=True)
+    department = models.ForeignKey('DepartMast', on_delete=models.CASCADE, null=True,to_field='DepartId')
+    company = models.ForeignKey('CompanyMast', on_delete=models.CASCADE, null=True,to_field='CompanyId')
+    designation = models.ForeignKey('DesMast', on_delete=models.CASCADE, null=True,to_field='Desgid')
     Cardstatus = models.BooleanField(default=True)
     Shift = models.CharField(max_length=50)
     CatName = models.TextField(null=True, blank=True)
     STATUS_E = models.CharField(max_length=50, null=True, blank=True)
     def __str__(self):
         return str(self.empcode)
+    class Meta:
+        db_table = 'EmpMast'
 
 class MonitorData(models.Model):
     id = models.BigIntegerField(primary_key=True)
     SRNO = models.CharField(max_length=50)
-    EnrollID = models.CharField(max_length = 100)
+    EnrollID = models.CharField(max_length=100)
     PunchDate = models.DateTimeField()
-    TRID= models.CharField(max_length=50)
+    TRID = models.CharField(max_length=50)
+
+    SEND_SERVER = models.CharField(max_length=50, null=True, blank=True)
+    RESEND_SERVER = models.CharField(max_length=50, null=True, blank=True)
+
     Errorstatus = models.IntegerField(default=0)
+
     def __str__(self):
         return self.SRNO
+
+    class Meta:
+        db_table = 'MonitorDataTbl'
 
 
 
@@ -89,6 +113,7 @@ class CompanyMast(models.Model):
 
 	def __str__(self):
 		return self.CompanyId
+    
 
 
 
@@ -103,7 +128,7 @@ class DepartMast(models.Model):
 class DesMast(models.Model):
 
 	Desgid = models.IntegerField(primary_key=True)
-	department = models.ForeignKey(DepartMast, on_delete=models.CASCADE, null=True, blank=True)
+	department = models.ForeignKey(DepartMast, on_delete=models.CASCADE, null=True, blank=True,to_field='DepartId')
 	Designation = models.TextField()
 
 	def __str__(self):
