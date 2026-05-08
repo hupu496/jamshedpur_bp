@@ -71,12 +71,12 @@
             <p class="text-xs font-weight-bold mb-0">{{ data.company.Address }}</p>
           </td>
           <td class="align-middle">
-            <a href="{% url 'edit_company' data.company.CompanyId %}" class="btn btn-sm btn-success" data-toggle="tooltip" data-original-title="Edit user">
+            <a href="{% url 'edit_company' data.company.id %}" class="btn btn-sm btn-success" data-toggle="tooltip" data-original-title="Edit user">
              <span class="material-icons opacity-6 me-2 text-md">
 save
 </span>
             </a>
-            <a class="btn btn-sm btn-danger" href="{% url 'delete_company' data.company.CompanyId %}">
+            <a class="btn btn-sm btn-danger" href="{% url 'delete_company' data.company.id %}">
             <span class="material-icons opacity-6 me-2 text-md">
 delete
 </span></a>

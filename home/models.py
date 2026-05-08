@@ -6,7 +6,7 @@ from datetime import timedelta
 # Create your models here.
 class GatePass(models.Model):
     allowing_entry = models.CharField(max_length=10, choices=[('Yes', 'Hazardous Area'), ('No', 'Non Hazardous Area')])
-    id = models.IntegerField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     cardNo                       = models.CharField(max_length=250,blank=False,null=False)
     date                         = models.DateField(null=True, blank=True)
     name                         = models.CharField(max_length=250,blank=True, null=True)
@@ -40,7 +40,7 @@ class GatePass(models.Model):
     class Meta:
         db_table = 'GatePass'
 class MachineMast(models.Model):
-    id = models.IntegerField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     MachineNo = models.CharField(max_length=50)
     RDRNO = models.CharField(max_length=50)
     PortNo = models.CharField(max_length=50)
@@ -60,7 +60,7 @@ class MachineMast(models.Model):
         db_table = 'Machines'
 
 class EnrollMast(models.Model):
-    id = models.IntegerField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     enrollid = models.CharField(max_length=100, unique=True)
     department = models.ForeignKey('DepartMast', on_delete=models.CASCADE, null=True)
     def __str__(self):
@@ -69,13 +69,13 @@ class EnrollMast(models.Model):
         db_table = 'EnrollMast'
 
 class EmpMast(models.Model): 
-    ids = models.BigAutoField(primary_key=True)
+    id = models.BigAutoField(primary_key=True)
     empcode = models.CharField(max_length=100)
     enrollid = models.ForeignKey(EnrollMast, on_delete=models.CASCADE, null=True)
     Cardno = models.CharField(max_length=50)
     Name = models.TextField(blank=True, null=True)
     department = models.ForeignKey('DepartMast', on_delete=models.CASCADE, null=True,to_field='DepartId')
-    company = models.ForeignKey('CompanyMast', on_delete=models.CASCADE, null=True,to_field='CompanyId')
+    company = models.ForeignKey('CompanyMast', on_delete=models.CASCADE, null=True,to_field='id')
     designation = models.ForeignKey('DesMast', on_delete=models.CASCADE, null=True,to_field='Desgid')
     Cardstatus = models.BooleanField(default=True)
     Shift = models.CharField(max_length=50)
@@ -107,7 +107,7 @@ class MonitorData(models.Model):
 
 
 class CompanyMast(models.Model):
-	CompanyId=models.IntegerField(primary_key=True)
+	id = models.AutoField(primary_key=True)
 	Company = models.TextField()
 	Address = models.TextField()
 
@@ -118,7 +118,7 @@ class CompanyMast(models.Model):
 
 
 class DepartMast(models.Model):
-	DepartId = models.IntegerField(primary_key=True)
+	id = models.AutoField(primary_key=True)
 	DepartName = models.TextField(null=True, blank=True)
 	Status = models.TextField(default=True)
 
@@ -127,7 +127,7 @@ class DepartMast(models.Model):
 
 class DesMast(models.Model):
 
-	Desgid = models.IntegerField(primary_key=True)
+	id = models.AutoField(primary_key=True)
 	department = models.ForeignKey(DepartMast, on_delete=models.CASCADE, null=True, blank=True,to_field='DepartId')
 	Designation = models.TextField()
 
@@ -135,7 +135,7 @@ class DesMast(models.Model):
 		return self.Desgid
       
 class ReportLog(models.Model):
-    Id = models.AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     date = models.DateField()  
     addedon = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     Status = models.IntegerField(default=1)
@@ -144,5 +144,6 @@ class ReportLog(models.Model):
         return f"{self.date}"
 
 class License(models.Model):
+    id = models.AutoField(primary_key=True)
     code = models.CharField(max_length=50, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
