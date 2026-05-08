@@ -30,7 +30,7 @@
            <div class="input-group input-group-outline is-valid my-3">
                                 <select name="department" id="id_department" class="form-control">
                                     {% for department in departlist %}
-                                        <option value="{{ department.DepartId }}" {% if department == form.instance.department %}selected{% endif %}>{{ department.DepartName }}</option>
+                                        <option value="{{ department.id }}" {% if department == form.instance.department %}selected{% endif %}>{{ department.DepartName }}</option>
                                     {% endfor %}
                                 </select>
                             </div>

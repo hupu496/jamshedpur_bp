@@ -64,12 +64,12 @@
             <p class="text-xs font-weight-bold mb-0">{{ data.department.DepartName }}</p>
           </td>
           <td class="align-middle">
-            <a href="{% url 'edit_depart' data.department.DepartId %}" class="btn btn-sm btn-success" data-toggle="tooltip" data-original-title="Edit user">
+            <a href="{% url 'edit_depart' data.department.id %}" class="btn btn-sm btn-success" data-toggle="tooltip" data-original-title="Edit user">
              <span class="material-icons opacity-6 me-2 text-md">
 save
 </span>
             </a>
-            <a class="btn btn-sm btn-danger" href="{% url 'delete_depart' data.department.DepartId %}">
+            <a class="btn btn-sm btn-danger" href="{% url 'delete_depart' data.department.id %}">
             <span class="material-icons opacity-6 me-2 text-md">
 delete
 </span></a>

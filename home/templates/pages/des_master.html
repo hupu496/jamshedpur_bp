@@ -30,7 +30,7 @@
         <!-- <label class="form-label">Select Department</label> -->
         <select name="DepartId" class="form-control">
           {% for list in departlist %}
-        	<option value="{{ list.DepartId }}">{{ list.DepartName }}</option>
+        	<option value="{{ list.id }}">{{ list.DepartName }}</option>
           {% endfor %}
         </select>
         </div>
@@ -75,12 +75,12 @@
             <p class="text-xs font-weight-bold mb-0">{{ data.designation.Designation }}</p>
           </td>
           <td class="align-middle">
-            <a href="{% url 'edit_designation' data.designation.Desgid %}" class="btn btn-sm btn-success" data-toggle="tooltip" data-original-title="Edit user">
+            <a href="{% url 'edit_designation' data.designation.id %}" class="btn btn-sm btn-success" data-toggle="tooltip" data-original-title="Edit user">
              <span class="material-icons opacity-6 me-2 text-md">
 save
 </span>
             </a>
-            <a class="btn btn-sm btn-danger" href="{% url 'delete_designation' data.designation.Desgid %}">
+            <a class="btn btn-sm btn-danger" href="{% url 'delete_designation' data.designation.id %}">
             <span class="material-icons opacity-6 me-2 text-md">
 delete
 </span></a>

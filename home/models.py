@@ -74,9 +74,9 @@ class EmpMast(models.Model):
     enrollid = models.ForeignKey(EnrollMast, on_delete=models.CASCADE, null=True)
     Cardno = models.CharField(max_length=50)
     Name = models.TextField(blank=True, null=True)
-    department = models.ForeignKey('DepartMast', on_delete=models.CASCADE, null=True,to_field='DepartId')
+    department = models.ForeignKey('DepartMast', on_delete=models.CASCADE, null=True,to_field='id')
     company = models.ForeignKey('CompanyMast', on_delete=models.CASCADE, null=True,to_field='id')
-    designation = models.ForeignKey('DesMast', on_delete=models.CASCADE, null=True,to_field='Desgid')
+    designation = models.ForeignKey('DesMast', on_delete=models.CASCADE, null=True,to_field='id')
     Cardstatus = models.BooleanField(default=True)
     Shift = models.CharField(max_length=50)
     CatName = models.TextField(null=True, blank=True)
@@ -128,7 +128,7 @@ class DepartMast(models.Model):
 class DesMast(models.Model):
 
 	id = models.AutoField(primary_key=True)
-	department = models.ForeignKey(DepartMast, on_delete=models.CASCADE, null=True, blank=True,to_field='DepartId')
+	department = models.ForeignKey(DepartMast, on_delete=models.CASCADE, null=True, blank=True,to_field='id')
 	Designation = models.TextField()
 
 	def __str__(self):

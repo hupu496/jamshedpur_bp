@@ -191,7 +191,7 @@ def live_data(request):
                             },
                             'machine': {
                                 'MachineNo': machine.MachineNo if machine else None,
-                                'Name': machine.Name if machine else None,
+                                'RDRNAME': machine.RDRNAME if machine else None,
                                 'Response': machine.Response if machine else None,
                             } if machine else None,
                             'employee': {
@@ -749,9 +749,9 @@ def emp_master(request):
        
         try:
             enrollid = EnrollMast.objects.get(id=enrollid)
-            company = CompanyMast.objects.get(CompanyId=compid)
-            department = DepartMast.objects.get(DepartId=DepartId)
-            designation = DesMast.objects.get(Desgid=Desgid)
+            company = CompanyMast.objects.get(id=compid)
+            department = DepartMast.objects.get(id=DepartId)
+            designation = DesMast.objects.get(id=Desgid)
             
             if not EmpMast.objects.filter(enrollid=enrollid).exists():
                 if not EmpMast.objects.filter(empcode=empcode).exists():
@@ -779,7 +779,7 @@ def emp_master(request):
       # Assuming foreign key
     enroll_dict = {}
     for department in departlist:
-        enroll_dict[department.DepartId] = enrollid_queryset.filter(department__DepartId=department.DepartId)
+        enroll_dict[department.DepartId] = enrollid_queryset.filter(department__id=department.DepartId)
     
     designation_dict = {}
     for desg in designationlist:
@@ -856,7 +856,7 @@ def edit_employee(request, pk):
 
     designation_dict = {}
     for desg in designationlist:
-        depart_id = desg.department.DepartId
+        depart_id = desg.department.id
         if depart_id not in designation_dict:
             designation_dict[depart_id] = []
         designation_dict[depart_id].append({
@@ -883,7 +883,7 @@ def enroll_mast(request):
         DepartId = request.POST.get('DepartId')
 
         try:
-            department = DepartMast.objects.get(DepartId=DepartId)
+            department = DepartMast.objects.get(id=DepartId)
             
             # Check if DepartId is '1' (or any specific condition)
             if str(DepartId) in ['1', '2']:
@@ -940,7 +940,7 @@ def des_master(request):
         DepartId = request.POST.get('DepartId')
         Designation = request.POST.get('Designation')
         
-        department = DepartMast.objects.get(DepartId=DepartId)
+        department = DepartMast.objects.get(id=DepartId)
         designation = DesMast(department=department, Designation=Designation)
         designation.save()
         return redirect('des_master')
@@ -962,7 +962,7 @@ def edit_designation(request, pk):
             departid=request.POST.get('department')
             
             designation = form.save(commit=False)
-            department = DepartMast.objects.get(DepartId=request.POST.get('department'))
+            department = DepartMast.objects.get(id=request.POST.get('department'))
             designation.department = department
             designation.save()
             return redirect('des_master')
