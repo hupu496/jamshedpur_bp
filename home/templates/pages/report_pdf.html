@@ -1,30 +1,105 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Daily Report {{ selected_date }}</title>
+{% extends 'layouts/base_background.html' %}
+{% load static %}
+{% block css %}
+.mt-n6 {
+margin-top: 0rem !important;
+}
+.text-gradient.text-primary {
+background-image: linear-gradient(195deg, #021750, #021750);
+}
+.btn-primary {
+--bs-btn-color: #000;
+--bs-btn-bg: #f37022;
+--bs-btn-border-color: #f37022;
+}
+.Cd{
+border-style: solid;
+border-color: #3e4f7a;
+border-radius: 9px;
+}
+marquee {
+width: 100%;
+height: 100%;
+display: block;
+}
+/* Add this for watermark background */
+.watermark-background {
+    background-image: url("{% static 'img/IndianOil_background.jpg' %}");
+    background-size: cover; /* Ensures the image covers the entire container */
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.2; /* Controls the opacity of the watermark */
+    position: fixed; /* Keeps the background fixed during scrolling */
+    top: 0;
+    left: 0;
+    width: 100vw; /* Full viewport width */
+    height: 100vh; /* Full viewport height */
+    z-index: -1; /* Sends the image behind other content */
+}
+.linear-text-gradient {
+                background: linear-gradient(to top, #eb6c21, #02154d);
+                -webkit-background-clip: text;
+                background-clip: text;
+                color: transparent;
+            }
+
+ .text-success {
+    color: #2d332d !important;
+}
+ .carousel-item {
+            background-color: #43A047;
+            color: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+        .item2 {
+            background-color: #F44335;
+            color: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+.visitor-input::placeholder {
+  color: black;
+  font-weight: bold;
+}
+{% endblock css %}
+{% block title %} IDaily Report {{ selected_date }} {% endblock title %}
+{% block body %} class="index-page bg-gray-200" {% endblock body %}
+{% block content %}
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-</head>
-<body>
+
  
-<h4>TOTAL HAZARDOUS: {{ hazard_total }}</h4>
-   <table id="hazardous-table" style="background-color: #F44335; border-radius: 10px; width: 100%; text-align: center;">
-                            <thead>
-                                <tr  style="font-size: 13px;" >
-                                    {% for data in hazardous %}
-                                        <th style="color: white; padding: 5px 7px;">{{ data.Department }}</th>
-                                    {% endfor %}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr  style="font-size: 13px;">
-                                    {% for data in hazardous %}
-                                        <td style="color: white;">{{ data.HeadCount }}</td>
-                                    {% endfor %}
-                                </tr>
-                            </tbody>
-                        </table>
-       <h4>TOTAL NON-HAZARDOUS: {{ non_hazard_total }}</h4>
-      <table id="non-hazardous-table" style="background-color: #43A047; border-radius: 10px; width: 100%; text-align: center;">
+  <div  style="border: 5px solid transparent;border-image: linear-gradient(#01154d, #eb6c21) 1; border-radius: 21px; padding: 10px; position: relative;">
+                  <h2 style=" font-size:48px;position: absolute; top: -35px; left: 50%; transform: translateX(-50%); background-color: white; padding: 0 10px; color: #4caf50;">HAZARDOUS AREA</h2>
+                  <div class="row">
+                     <div class="col-md-3 position-relative">
+                        <div class="p-2 text-center">
+                          
+                           <div >
+                              
+                              <h4 class="text-gradient text-primary" style="
+                                    font-size: 40px;
+                                "></i>MAIN GATE</h4>
+                              
+                                                          </div>
+                                                        </div>
+                                                        <hr class="vertical dark">
+                                                    </div>
+                                                    <div class="col-md-3 position-relative">
+                                    <div class="p-3 text-center">
+                                        <h1 class="text-gradient text-primary" style="font-size: 69px;"><i class="fas fa-users"></i></h1>
+                                        <h5 class="mt-3" style="font-size: 30px;">TOTAL HEAD COUNT</h5>
+                                        <a href="list/MAIN GATE TOTAL HEAD COUNT" class="btn btn-icon btn-2 bg-gradient-success" style="width: 145px;margin-top:13px;height: 60px;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+                                            <b style="font-size: 30px;" id="non-hazard-total">{{ non_hazard_total }}</b>
+                                        </a>
+                                    </div>
+                                    <hr class="vertical dark">
+                                    <div style="background-color: #43A047; border-radius: 10px;">
+                                        
+                                        <table id="non-hazardous-table" style="background-color: #43A047; border-radius: 10px; width: 100%; text-align: center;">
                                             <thead>
                                                 <tr style="font-size: 13px;">
                                                     {% for data in non_hazardous %}
@@ -40,7 +115,103 @@
                                                 </tr>
                                             </tbody>
                                         </table>
-<div>
+                                      
+                                        
+                                    </div>
+                                </div>
+                     <div class="col-md-3 position-relative">
+                        <div class="p-3 text-center">
+                           <h1 class="text-gradient text-primary"style="
+                              font-size: 69px;" ><i class="far fa-arrow-alt-circle-right"></i></h1>
+                                                    <h5 class="mt-3" style="
+                              font-size: 40px;
+                          ">IN</h5>
+                           <a href="list/MAIN GATE IN" class="btn btn-icon btn-2 bg-gradient-success"style="width: 145px;height: 60px;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); margin-top: 3px;">
+                           <b style="font-size: 30px;" id="non-hazard-in">{{ non_hazard_in }}</b>
+                           </a>
+                        </div>
+                        <hr class="vertical dark">
+                     </div>
+                     <div class="col-md-3">
+                        <div class="p-3 text-center">
+                           <h1 class="text-gradient text-primary"style="
+                            font-size: 69px;" ><i class="far fa-arrow-alt-circle-left"></i></h1>
+                                                  <h5 class="mt-3" style="
+                            font-size: 40px;
+                        ">OUT</h5>
+                           <a href="list/MAIN GATE OUT"  class="btn btn-icon btn-2 bg-gradient-success"style="width: 145px;height: 60px;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); margin-top: 3px;">
+                           <b style="font-size: 30px;" id="non-hazard-out">{{ non_hazard_out }}</b>
+                           </a>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+               <!--  -->
+               <br>
+               <div style="margin-top: 12px;border: 5px solid transparent;border-image: linear-gradient(#01154d, #eb6c21) 1; border-radius: 21px; padding: 16px; position: relative;">
+                  <h2 style="font-size:48px;position: absolute; top: -35px; left: 50%; transform: translateX(-50%); background-color: white; padding: 0 10px; color: #f44335;">HAZARDOUS AREA</h2>
+                  <div class="row">
+                     <div class="col-md-3 position-relative">
+                        <div class="p-3 text-center">
+                           <div >
+                              <h4 class="text-gradient text-primary" style="
+    font-size: 40px;"></i>LICENCE GATE</h4>
+   <!-- <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#gate3Modal">Gate 3 Visitor</button> -->
+                           </div>
+                        </div>
+                        <hr class="vertical dark">
+                     </div>
+                     <div class="col-md-3 position-relative">
+                        <div class="p-3 text-center">
+                           <h1 class="text-gradient text-primary"></h1>
+                          <h5 class="mt-3" style="font-size: 30px;">TOTAL HEAD COUNT</h5>
+                           <a href="list/LICENCE TOTAL HEAD COUNT"  class="btn btn-icon btn-2 btn btn-danger" style="width: 145px;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);height: 60px;">
+                           <b style="font-size: 30px;" id="hazard-total">{{ hazard_total }}</b>
+                           </a>
+                        </div>
+                        <hr class="vertical dark">
+                      <div style="background-color: #F44335; border-radius: 10px;">
+        
+                        <table id="hazardous-table" style="background-color: #F44335; border-radius: 10px; width: 100%; text-align: center;">
+                            <thead>
+                                <tr  style="font-size: 13px;" >
+                                    {% for data in hazardous %}
+                                        <th style="color: white; padding: 5px 7px;">{{ data.Department }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr  style="font-size: 13px;">
+                                    {% for data in hazardous %}
+                                        <td style="color: white;">{{ data.HeadCount }}</td>
+                                    {% endfor %}
+                                </tr>
+                            </tbody>
+                        </table>
+    </div>
+                     </div>
+                     <div class="col-md-3 position-relative">
+                        <div class="p-3 text-center">
+                           <h1 class="text-gradient text-primary" ></h1>
+                         <h5 class="mt-3" style="font-size: 30px;">IN</h5>
+                           <a href="list/LICENCE IN"  class="btn btn-icon btn-2 btn btn-danger"style="width: 145px;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);height: 60px;" >
+                           <b style="font-size: 30px;" id="hazard-in">{{ hazard_in_count }}</b>
+                           </a>
+                        </div>
+                        <hr class="vertical dark">
+                     </div>
+                     <div class="col-md-3">
+                        <div class="p-3 text-center">
+                           <h1 class="text-gradient text-primary" ></h1>
+                        <h5 class="mt-3" style="font-size: 30px;">OUT</h5>
+                           <a href="list/LICENCE OUT"  class="btn btn-icon btn-2 btn btn-danger"style="width: 145px;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);height: 60px;" >
+                           <b style="font-size: 30px;" id="hazard-out">{{ hazard_out_count }}</b>
+                           </a>
+                        </div>
+                     </div>
+                   
+                  </div>
+               </div> 
    <h3>Headcount Report - {{ selected_date }}Total Records: {{ total }}</h3>
 {% if data %}
  <table border="1" cellpadding="5" id="pdf-content">
@@ -97,5 +268,4 @@
       html2pdf().set(opt).from(element).save();
     }
   </script>
-</body>
-</html>
+{% endblock content %}

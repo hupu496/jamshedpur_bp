@@ -59,7 +59,7 @@
       <select name="DepartId" class="form-control" id="department-select">
         <option>Select Department</option>
         {% for data in departlist %}
-          <option value="{{ data.DepartId }}">{{ data.DepartName }}</option>
+          <option value="{{ data.id }}">{{ data.DepartName }}</option>
           {% endfor %}
     
         </select>
@@ -87,7 +87,7 @@
        <select name="compid" class="form-control">
         <option>Select Company</option>
           {% for data in complist %}
-          <option value="{{ data.CompanyId }}">{{ data.Company }}</option>
+          <option value="{{ data.id }}">{{ data.Company }}</option>
           {% endfor %}
         </select>
         </div>
@@ -163,12 +163,12 @@
           
           
          <td class="align-middle">
-           <a href="{% url 'edit_employee' data.employeelist.ids %}" class="btn btn-sm btn-success" data-toggle="tooltip" data-original-title="Edit user">
+           <a href="{% url 'edit_employee' data.employeelist.id %}" class="btn btn-sm btn-success" data-toggle="tooltip" data-original-title="Edit user">
              <span class="material-icons opacity-6 me-2 text-md">
 save
 </span>
             </a> 
-            <a class="btn btn-sm btn-danger" href="{% url 'delete_employee' data.employeelist.ids %}">
+            <a class="btn btn-sm btn-danger" href="{% url 'delete_employee' data.employeelist.id %}">
             <span class="material-icons opacity-6 me-2 text-md">
 delete
 </span></a>

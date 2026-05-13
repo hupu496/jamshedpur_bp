@@ -503,71 +503,94 @@ def listss(request, lists):
                     pass
             else:
                 if machine.MachineNo in ['7']:
-                    data = []  # Initialize the list to store results
-                    processed_min_ids = min_ids.copy()  # Copy min_ids to track unmatched IDs
-                    removed_items, remaining_items = process_ids(mout_ids, processed_min_ids)
-                    enroll_data = remaining_items  # Remove duplicates and sort if needed
-                    # Fetch employee data based on enroll_data
 
-                    for remainid in enroll_data:  # Iterate over each ID in the single-row output
-                        employeedata = EmpMast.objects.filter(empcode=remainid).first()  # Use `first()` to fetch the first matching record
-                       
+                    data = []
+
+                    processed_min_ids = min_ids.copy()
+                    removed_items, remaining_items = process_ids(mout_ids, processed_min_ids)
+
+                    enroll_data = remaining_items
+
+                    # ✅ Fetch all employees in single query
+                    employee_map = {
+                        emp.empcode: emp
+                        for emp in EmpMast.objects.filter(
+                            empcode__in=enroll_data
+                        ).select_related('designation', 'department')
+                    }
+
+                    for remainid in enroll_data:
+
+                        employeedata = employee_map.get(remainid)
 
                         if employeedata:
                             employee_info = {
                                 'name': employeedata.Name,
                                 'empcode': employeedata.empcode,
-                                'designation': employeedata.designation.Designation,
-                                'department': employeedata.department.DepartName,
+                                'designation': employeedata.designation.Designation if employeedata.designation else None,
+                                'department': employeedata.department.DepartName if employeedata.department else None,
                             }
                         else:
                             employee_info = {
                                 'name': None,
+                                'empcode': None,
                                 'designation': None,
                                 'department': None,
                             }
 
-                        # Append the employee data to the results list
                         data.append({
                             'monitor': remainid,
                             'machine': machine.MachineNo,
                             'employee': employee_info,
                         })
-                    
+
+
         elif lists == 'LICENCE TOTAL HEAD COUNT':
+
             if (len(gin_ids) <= len(gout_ids)):
-                if machine.MachineNo in ['2', '4','6']:
+                if machine.MachineNo in ['2', '4', '6']:
                     pass
             else:
-                if machine.MachineNo in ['1', '3','5']:
-                    data = []  # Initialize the list to store results
-                    processed_gin_ids = gin_ids.copy()  # Copy gin_ids to track unmatched IDs
-                    removed_items, remaining_items = process_ids(gout_ids, processed_gin_ids)
-                    enroll_data = remaining_items  # Remove duplicates and sort if needed
-                   
+                if machine.MachineNo in ['1', '3', '5']:
 
+                    data = []
 
-                    # Fetch employee data based on enroll_data
+                    processed_gin_ids = gin_ids.copy()
 
-                    for remainid in enroll_data:  # Iterate over each ID in the single-row output
-                        employeedata = EmpMast.objects.filter(empcode=remainid).first()  # Use `first()` to fetch the first matching record
-                       
+                    removed_items, remaining_items = process_ids(
+                        gout_ids,
+                        processed_gin_ids
+                    )
+
+                    enroll_data = remaining_items
+
+                    # ✅ Fetch all employees in single query
+                    employee_map = {
+                        emp.empcode: emp
+                        for emp in EmpMast.objects.filter(
+                            empcode__in=enroll_data
+                        ).select_related('designation', 'department')
+                    }
+
+                    for remainid in enroll_data:
+
+                        employeedata = employee_map.get(remainid)
 
                         if employeedata:
                             employee_info = {
                                 'name': employeedata.Name,
                                 'empcode': employeedata.empcode,
-                                'designation': employeedata.designation.Designation,
-                                'department': employeedata.department.DepartName,
+                                'designation': employeedata.designation.Designation if employeedata.designation else None,
+                                'department': employeedata.department.DepartName if employeedata.department else None,
                             }
                         else:
                             employee_info = {
                                 'name': None,
+                                'empcode': None,
                                 'designation': None,
                                 'department': None,
                             }
 
-                        # Append the employee data to the results list
                         data.append({
                             'monitor': remainid,
                             'machine': machine.MachineNo,
@@ -779,15 +802,15 @@ def emp_master(request):
       # Assuming foreign key
     enroll_dict = {}
     for department in departlist:
-        enroll_dict[department.DepartId] = enrollid_queryset.filter(department__id=department.DepartId)
+        enroll_dict[department.id] = enrollid_queryset.filter(department__id=department.id)
     
     designation_dict = {}
     for desg in designationlist:
-        depart_id = desg.department.DepartId
+        depart_id = desg.department.id
         if depart_id not in designation_dict:
             designation_dict[depart_id] = []
         designation_dict[depart_id].append({
-            'Desgid': desg.Desgid,
+            'Desgid': desg.id,
             'Designation': desg.Designation
         })
 
@@ -808,7 +831,7 @@ def get_departments_by_enrollid(request):
         try:
             enroll = EnrollMast.objects.get(id=enrollid)
             departments = DepartMast.objects.filter(enroll=enroll)  # Adjust the query as per your model relationships
-            department_data = [{'DepartId': dept.DepartId, 'DepartName': dept.DepartName} for dept in departments]
+            department_data = [{'id': dept.id, 'DepartName': dept.DepartName} for dept in departments]
             return JsonResponse({'departments': department_data}, safe=False)
         except EnrollMast.DoesNotExist:
             return JsonResponse({'error': 'Invalid EnrollID'}, status=400)
@@ -860,7 +883,7 @@ def edit_employee(request, pk):
         if depart_id not in designation_dict:
             designation_dict[depart_id] = []
         designation_dict[depart_id].append({
-            'Desgid': desg.Desgid,
+            'Desgid': desg.id,
             'Designation': desg.Designation
         })
 
@@ -870,14 +893,12 @@ def edit_employee(request, pk):
         'designation_dict': designation_dict,
     })
 @csrf_exempt 
-@login_required(login_url='/')
 def delete_employee(request, pk):
     employee = get_object_or_404(EmpMast, pk=pk)
     employee.delete()
     return redirect('emp_master')
 
 @csrf_exempt 
-@login_required(login_url='/')
 def enroll_mast(request):
     if request.method == 'POST':
         DepartId = request.POST.get('DepartId')
@@ -928,7 +949,6 @@ def enroll_mast(request):
 
     return render(request, 'pages/enroll_mast.html', context)
 @csrf_exempt 
-@login_required(login_url='/')
 def delete_enroll(request, pk):
     employee = get_object_or_404(EnrollMast, pk=pk)
     
@@ -971,7 +991,7 @@ def edit_designation(request, pk):
     departlist = DepartMast.objects.all()
     return render(request, 'pages/edit_designation.html', {'form': form, 'departlist': departlist})
 @csrf_exempt 
-@login_required(login_url='/')
+
 def delete_designation(request, pk):
     designation = get_object_or_404(DesMast, pk=pk)
     designation.delete()
@@ -979,7 +999,7 @@ def delete_designation(request, pk):
     return redirect('des_master')
 
 @csrf_exempt 
-@login_required(login_url='/')
+
 def comp_master(request):
     if request.method == 'POST':
         Company = request.POST.get('Company')

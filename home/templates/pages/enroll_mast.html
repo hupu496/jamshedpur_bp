@@ -52,7 +52,7 @@
         <select name="DepartId" id="department-select" class="form-control" onchange="checkDepartment()">
             <option>Select Department</option>
             {% for list in departlist %}
-                <option value="{{ list.DepartId }}">{{ list.DepartName }}</option>
+                <option value="{{ list.id }}">{{ list.DepartName }}</option>
             {% endfor %}
         </select>
     </div>
