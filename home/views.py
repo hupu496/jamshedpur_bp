@@ -171,7 +171,11 @@ def live_data(request):
             selected_date = request.session.get('selected_date', today.strftime("%Y-%m-%d"))
             selected_date = timezone.datetime.strptime(selected_date, "%Y-%m-%d").date()
             try:
-                livedata = MonitorData.objects.filter(PunchDate__date=selected_date, Errorstatus=0).order_by('-id')[:13]
+                livedata = MonitorData.objects.filter(
+                        PunchDate__date=selected_date
+                    ).filter(
+                        ~Q(Errorstatus=2)
+                    ).order_by('-id')[:13]
                 data = []
                 for live in livedata:
                     try:
@@ -257,10 +261,9 @@ def live_data(request):
                         if not previous_srnos:
                             continue  # or log error
                         adjusted_punchtime = live.PunchDate + timedelta(seconds=30)
-                        last_id = MonitorData.objects.aggregate(max_id=Max('id'))['max_id'] or 0
+                       
 
                         MonitorData.objects.create(
-                            id=last_id + 1,
                             EnrollID=live.EnrollID,
                             PunchDate=adjusted_punchtime,
                             SRNO=previous_srnos,
@@ -274,7 +277,7 @@ def live_data(request):
                         adjusted_punchtime = live.PunchDate - timedelta(seconds=30)
                         last_id = MonitorData.objects.aggregate(max_id=Max('id'))['max_id'] or 0
                         MonitorData.objects.create(
-                            id=last_id + 1,
+                            
                             EnrollID=live.EnrollID,
                             PunchDate=adjusted_punchtime,
                             SRNO=previous_srnos,
@@ -288,7 +291,7 @@ def live_data(request):
                         adjusted_punchtime = live.PunchDate + timedelta(seconds=30)
                         last_id = MonitorData.objects.aggregate(max_id=Max('id'))['max_id'] or 0
                         MonitorData.objects.create(
-                            id=last_id + 1,
+                            
                             EnrollID=live.EnrollID,
                             PunchDate=adjusted_punchtime,
                             SRNO=previous_srnos,
@@ -302,7 +305,7 @@ def live_data(request):
                         adjusted_punchtime = live.PunchDate - timedelta(seconds=30)
                         last_id = MonitorData.objects.aggregate(max_id=Max('id'))['max_id'] or 0
                         MonitorData.objects.create(
-                            id=last_id + 1,
+                            
                             EnrollID=live.EnrollID,
                             PunchDate=adjusted_punchtime,
                             SRNO=previous_srnos,
@@ -1540,7 +1543,6 @@ def auto_report(request):
     # today = date(2025, 3, 31)
     for i in range(1, 11):  # Exclude today, so start from 1
         dt = today - timedelta(days=i)
-
         # Check if report already exists
         if not ReportLog.objects.filter(date=dt).exists():
             print(f"No report found for {dt}, generating now...")

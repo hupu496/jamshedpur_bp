@@ -64,6 +64,24 @@ display: block;
   color: black;
   font-weight: bold;
 }
+/* FULL PAGE FIT */
+body{
+    margin:0;
+    padding:0;
+    font-family: Arial, sans-serif;
+    overflow-x:hidden;
+}
+
+/* MAIN CONTENT */
+#pdf-content{
+    width:100% !important;
+    max-width:100% !important;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+
+}
 {% endblock css %}
 {% block title %} IDaily Report {{ selected_date }} {% endblock title %}
 {% block body %} class="index-page bg-gray-200" {% endblock body %}
@@ -72,8 +90,8 @@ display: block;
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
  
-  <div  style="border: 5px solid transparent;border-image: linear-gradient(#01154d, #eb6c21) 1; border-radius: 21px; padding: 10px; position: relative;">
-                  <h2 style=" font-size:48px;position: absolute; top: -35px; left: 50%; transform: translateX(-50%); background-color: white; padding: 0 10px; color: #4caf50;">HAZARDOUS AREA</h2>
+  <div  style="border: 5px solid transparent;margin-top:35px;border-image: linear-gradient(#01154d, #eb6c21) 1; border-radius: 21px; padding: 10px; position: relative;">
+                  <h2 style=" font-size:48px;position: absolute; top:-35px; left: 50%; transform: translateX(-50%); background-color: white; padding: 0 10px; color: #4caf50;">NON HAZARDOUS AREA</h2>
                   <div class="row">
                      <div class="col-md-3 position-relative">
                         <div class="p-2 text-center">
@@ -256,6 +274,19 @@ display: block;
   </div>
 
   <script>
+const opt = {
+    margin: 0.2,
+    filename: 'report_{{ selected_date }}.pdf',
+    image: { type: 'jpeg', quality: 1 },
+    html2canvas: {
+        scale: 1
+    },
+    jsPDF: {
+        unit: 'mm',
+        format: 'a4',
+        orientation: 'portrait'
+    }
+};
     function downloadPDF() {
       const element = document.getElementById('pdf-content');
       const opt = {

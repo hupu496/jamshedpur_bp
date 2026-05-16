@@ -87,7 +87,7 @@ class EmpMast(models.Model):
         db_table = 'EmpMast'
 
 class MonitorData(models.Model):
-    id = models.BigIntegerField(primary_key=True)
+    id = models.BigAutoField(primary_key=True)
     SRNO = models.CharField(max_length=50)
     EnrollID = models.CharField(max_length=100)
     PunchDate = models.DateTimeField()
@@ -96,7 +96,7 @@ class MonitorData(models.Model):
     SEND_SERVER = models.CharField(max_length=50, null=True, blank=True)
     RESEND_SERVER = models.CharField(max_length=50, null=True, blank=True)
 
-    Errorstatus = models.IntegerField(default=0)
+    Errorstatus = models.IntegerField(null=True, default=0)
 
     def __str__(self):
         return self.SRNO

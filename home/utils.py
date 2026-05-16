@@ -7,6 +7,7 @@ from django.conf import settings
 from datetime import timedelta
 from django.db.models import Count
 from collections import defaultdict
+from django.db import connection
 # Try to import pisa
 try:
     from xhtml2pdf import pisa
@@ -134,26 +135,68 @@ def generate_report_for_date(report_date):
         ReportLog.objects.create(date=report_date, Status=1)
         print(f"xhtml2pdf not installed. Saved as HTML: {fallback_html_path}")
 def auto_backup_if_required(days=15):
-    backup_dir = os.path.join(settings.BASE_DIR, 'db_backups')
-    if not os.path.exists(backup_dir):
-        return
+
+    backup_dir = r"C:\Program Files\Microsoft SQL Server\MSSQL13.MSSQLSERVER\MSSQL\DATA\DATAIOCL.mdb"
+
+    # Create backup folder if not exists
+    os.makedirs(backup_dir, exist_ok=True)
+
+    # Find all SQL backup files
     backup_files = [
         f for f in os.listdir(backup_dir)
-        if f.endswith('_db.sqlite3')
+        if f.endswith('.bak')
     ]
+
+    # Create first backup if no backup exists
     if not backup_files:
-        call_command('backup_old_monitordata')
+        create_sql_backup(backup_dir)
         return
 
+    # Extract date from filename
     def extract_date(filename):
-        date_str = filename.split('_')[0]
-        return datetime.strptime(date_str, '%d-%m-%Y')
+        try:
+            # Example:
+            # 15-05-2026_10-30-00_DATAIOCL.bak
+            date_str = filename.split('_')[0]
+            return datetime.strptime(date_str, '%d-%m-%Y')
+        except:
+            return datetime.min
 
+    # Find latest backup
     latest_file = max(backup_files, key=extract_date)
+
     last_backup_date = extract_date(latest_file)
 
     diff_days = (datetime.now() - last_backup_date).days
 
+    # Create backup after N days
     if diff_days >= days:
-        call_command('backup_old_monitordata')
+        create_sql_backup(backup_dir)
+
+
+def create_sql_backup(backup_dir):
+
+    db_name = settings.DATABASES['default']['NAME']
+
+    filename = datetime.now().strftime(
+        '%d-%m-%Y_%H-%M-%S_' + db_name + '.bak'
+    )
+
+    backup_path = os.path.join(backup_dir, filename)
+
+    # SQL Server requires double backslashes
+    backup_path_sql = backup_path.replace('\\', '\\\\')
+
+    sql = f"""
+    BACKUP DATABASE [{db_name}]
+    TO DISK = N'{backup_path_sql}'
+    WITH FORMAT,
+    INIT,
+    NAME = N'{db_name}-Full Backup';
+    """
+
+    with connection.cursor() as cursor:
+        cursor.execute(sql)
+
+    print(f"Backup created: {backup_path}")
 
