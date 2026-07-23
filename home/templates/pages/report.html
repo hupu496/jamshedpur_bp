@@ -97,7 +97,7 @@
           <div class="input-group input-group-outline my-2">
             <select type="text" class="form-control" name="department" id="exampleFormControlSelect1" disabled>
               {% for item in department %}
-                <option value="{{ item.DepartId }}">{{ item.DepartName }}</option>
+                <option value="{{ item.id }}">{{ item.DepartName }}</option>
               {% endfor %}
             </select>
           </div>

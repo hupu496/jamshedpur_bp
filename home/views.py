@@ -647,6 +647,10 @@ def index(request,listing):
     # Page from the theme 
     return render(request, 'pages/index.html',{'data':listing})
 
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from django.utils import timezone
+
 @login_required(login_url='/')
 def report(request):
     today = timezone.now().date()
@@ -667,48 +671,133 @@ def report(request):
         'department': DepartMast.objects.all(),
     }
 
-    livedata = MonitorData.objects.all()
-    srnos = livedata.values_list('SRNO', flat=True)
-    enrollids = livedata.values_list('EnrollID', flat=True)
-    machines = MachineMast.objects.filter(SRNO__in=srnos)
-    enrolls = EnrollMast.objects.filter(enrollid__in=enrollids)
-    employees = EmpMast.objects.select_related('department', 'company', 'designation', 'enrollid').filter(enrollid__in=enrolls)
-    machine_dict = {machine.SRNO: machine for machine in machines}
-    enroll_dict = {enroll.enrollid: enroll for enroll in enrolls}
-    employee_dict = {employee.enrollid_id: employee for employee in employees}
-    if filter_type == 'dateWise' and selected_date:
-        livedatas = MonitorData.objects.filter(PunchDate__date=selected_date)
-    elif filter_type == 'gateWise' and selected_date:
+    # Default queryset
+    livedatas = MonitorData.objects.none()
+
+    # -------------------------
+    # Filter Data
+    # -------------------------
+
+    if filter_type == 'dateWise':
+        livedatas = MonitorData.objects.filter(
+            PunchDate__date=selected_date
+        )
+
+    elif filter_type == 'gateWise':
         gate_id = request.POST.get('location')
+
         if gate_id:
-            livedatas = MonitorData.objects.filter(SRNO=gate_id,PunchDate__date=selected_date)
-    elif filter_type == 'employeeWise' and selected_date:
+            livedatas = MonitorData.objects.filter(
+                SRNO=gate_id,
+                PunchDate__date=selected_date
+            )
+        else:
+            livedatas = MonitorData.objects.filter(
+                PunchDate__date=selected_date
+            )
+
+    elif filter_type == 'employeeWise':
         employee_id = request.POST.get('empcode')
+
         if employee_id:
-            enrolls = EnrollMast.objects.filter(enrollid=employee_id)
-            livedatas = MonitorData.objects.filter(EnrollID__in=enrolls,PunchDate__date=selected_date)
-    elif filter_type == 'departmentWise' and selected_date:
+            livedatas = MonitorData.objects.filter(
+                EnrollID=employee_id,
+                PunchDate__date=selected_date
+            )
+        else:
+            livedatas = MonitorData.objects.filter(
+                PunchDate__date=selected_date
+            )
+
+    elif filter_type == 'departmentWise':
         department_id = request.POST.get('department')
+
         if department_id:
-            emp = EmpMast.objects.select_related('department', 'company', 'designation', 'enrollid').filter(department=department_id)
-            enrolls = EnrollMast.objects.filter(id__in=emp.values_list('enrollid', flat=True))
-            livedatas = MonitorData.objects.filter(EnrollID__in=enrolls.values_list('enrollid', flat=True),PunchDate__date=selected_date)  #
+            employee_qs = EmpMast.objects.filter(
+                department_id=department_id
+            )
+
+            enroll_ids = employee_qs.values_list(
+                'enrollid__enrollid',
+                flat=True
+            )
+
+            livedatas = MonitorData.objects.filter(
+                EnrollID__in=enroll_ids,
+                PunchDate__date=selected_date
+            )
+        else:
+            livedatas = MonitorData.objects.filter(
+                PunchDate__date=selected_date
+            )
+
     else:
-        livedatas = MonitorData.objects.filter(PunchDate__date=today)
+        livedatas = MonitorData.objects.filter(
+            PunchDate__date=today
+        )
+
+    # -------------------------
+    # Related Data
+    # -------------------------
+
+    srnos = livedatas.values_list('SRNO', flat=True)
+    enrollids = livedatas.values_list('EnrollID', flat=True)
+
+    machines = MachineMast.objects.filter(
+        SRNO__in=srnos
+    )
+
+    enrolls = EnrollMast.objects.filter(
+        enrollid__in=enrollids
+    )
+
+    employees = EmpMast.objects.select_related(
+        'department',
+        'company',
+        'designation',
+        'enrollid'
+    ).filter(
+        enrollid__in=enrolls
+    )
+
+    machine_dict = {
+        machine.SRNO: machine
+        for machine in machines
+    }
+
+    enroll_dict = {
+        enroll.enrollid: enroll
+        for enroll in enrolls
+    }
+
+    employee_dict = {
+        employee.enrollid_id: employee
+        for employee in employees
+    }
+
+    # -------------------------
+    # Final Result
+    # -------------------------
 
     for live in livedatas:
+
         machine = machine_dict.get(live.SRNO)
-        if not machine:
-            continue
         enroll = enroll_dict.get(live.EnrollID)
-        employeedata = employee_dict.get(enroll.id) if enroll else None
+
+        employee = None
+        if enroll:
+            employee = employee_dict.get(enroll.id)
+
         data.append({
             'monitor': live,
             'machine': machine,
-            'employee': employeedata
+            'employee': employee
         })
+
     context['data'] = data
+
     return render(request, 'pages/report.html', context)
+
   
 @login_required(login_url='/')
 def dashboard(request):
