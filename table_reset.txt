@@ -4,17 +4,12 @@ from home.models import EmpMast,EnrollMast,MonitorData,DepartMast,DesMast,Report
 EmpMast.objects.all().delete()
 EnrollMast.objects.all().delete()
 MonitorData.objects.all().delete()
-DepartMast.objects.all().delete()
-DesMast.objects.all().delete()
+
 with connection.cursor() as cursor:
     cursor.execute("DELETE FROM sqlite_sequence WHERE name='home_monitordata';")
     cursor.execute("DELETE FROM sqlite_sequence WHERE name='home_enrollmast';")
-    
     cursor.execute("DELETE FROM sqlite_sequence WHERE name='home_empmast';")
-    cursor.execute("DELETE FROM sqlite_sequence WHERE name='home_enrollmast';")
-    cursor.execute("DELETE FROM sqlite_sequence WHERE name='home_monitordata';")
-    cursor.execute("DELETE FROM sqlite_sequence WHERE name='home_departmast';")
-    cursor.execute("DELETE FROM sqlite_sequence WHERE name='home_desmast';")
+   
 
 
        ┌─────────────────────────┐        LAN Network        ┌─────────────────────────┐
